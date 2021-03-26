@@ -23,6 +23,9 @@ parser.add_argument('--num-styles', type=int, default=1, help='Number of styles 
 parser.add_argument('--alpha', type=float, default=1.0,
                     help='The weight that controls the degree of \
                           stylization. Should be between 0 and 1')
+parser.add_argument('--beta', type=float, default=1.0,
+                    help='The weight that controls the degree of \
+                          blend of content and stylized. Should be between 0 and 1')
 parser.add_argument('--extensions', nargs='+', type=str, default=['png', 'jpeg', 'jpg'], help='List of image extensions to scan style and content directory for (case sensitive), default: png, jpeg, jpg')
 
 # Advanced options
@@ -128,6 +131,8 @@ def main():
                     with torch.no_grad():
                         output = style_transfer(vgg, decoder, content, style,
                                                 args.alpha)
+
+                    output = args.beta * output + (1-args.beta) * content
                     output = output.cpu()
 
                     rel_path = content_path.relative_to(content_dir)
